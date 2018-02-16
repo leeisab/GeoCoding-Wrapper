@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.IO;
 using System.Text.RegularExpressions;
-using System.Data;
 using Newtonsoft.Json;
 
 namespace Geocode
@@ -25,22 +25,19 @@ namespace Geocode
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.WriteLine("[Warning] API key Missing. Your requests may be throttled or limited");
                 Console.ForegroundColor = ConsoleColor.White;
-                Console.WriteLine("Press Enter To Continue ...");
-                Console.ReadKey();
-                Console.Clear();
             }
         }
 
-        private string WebRequest(string arg)
-        {
-            WebRequest request = HttpWebRequest.Create(Regex.Replace($"{BASE_URL}{arg}&key={_apiKey}", "\\s", "+"));
-            WebResponse response = request.GetResponse();
 
-            string json;
-            using (var stream = new StreamReader(response.GetResponseStream())) {
-                json = stream.ReadToEnd();
-            }
-            return json;
+        private string WebRequest(string arg) => GetRequest(arg).GetAwaiter().GetResult();
+
+        private async Task<string> GetRequest(string arg)
+        {
+            HttpClient client = new HttpClient();
+            client.DefaultRequestHeaders.Accept.Clear();
+            client.DefaultRequestHeaders.Accept.Add( new MediaTypeWithQualityHeaderValue("application/json"));
+            var response = await client.GetAsync($"{BASE_URL}{arg}");
+            return await response.Content.ReadAsStringAsync();
         }
 
         public GeoCoordinates GetCoordinates(GeoAddress address)
