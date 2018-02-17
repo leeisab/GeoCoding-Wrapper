@@ -7,7 +7,7 @@ namespace Geocode
 {
     public class Address
     {
-        public string Street { get; set; }
+        public string Street { get; set; } = "";
         public string StreetNumber { get; set; }
         public string Apt { get; set; }
         public string City { get; set; }
@@ -21,25 +21,39 @@ namespace Geocode
         internal Address(GeoObj obj)
         {
             Street = obj.results[0].address_components
-               .Single(x => x.types[0] == "route").long_name;
+                .Where(x => x.types[0] == "route")
+                .DefaultIfEmpty(new Address_Components() { long_name = null })
+                .SingleOrDefault().long_name;
 
             StreetNumber = obj.results[0].address_components
-                .Single(x => x.types[0] == "street_number").long_name;
+               .Where(x => x.types[0] == "street_number")
+               .DefaultIfEmpty(new Address_Components() { long_name = null })
+               .SingleOrDefault().long_name;
 
             Apt = obj.results[0].address_components
-                .Single(x => x.types[0] == "premise").long_name;
+               .Where(x => x.types[0] == "premise")
+               .DefaultIfEmpty(new Address_Components() { long_name = null })
+               .SingleOrDefault().long_name;
 
             City = obj.results[0].address_components
-               .Single(x => x.types[0] == "locality").long_name;
+              .Where(x => x.types[0] == "locality")
+              .DefaultIfEmpty(new Address_Components() { long_name = null })
+              .SingleOrDefault().long_name;
 
             Region = obj.results[0].address_components
-                .Single(x => x.types[0] == "administrative_area_level_1").long_name;
+               .Where(x => x.types[0] == "administrative_area_level_1")
+               .DefaultIfEmpty(new Address_Components() { long_name = null })
+               .SingleOrDefault().long_name;
 
             PostalCode = obj.results[0].address_components
-                .Single(x => x.types[0] == "postal_code").long_name;
+                .Where(x => x.types[0] == "postal_code")
+                .DefaultIfEmpty(new Address_Components() { long_name = null })
+                .SingleOrDefault().long_name;
 
             Country = obj.results[0].address_components
-                .Single(x => x.types[0] == "country").long_name;
+               .Where(x => x.types[0] == "country")
+               .DefaultIfEmpty(new Address_Components() { long_name = null })
+               .SingleOrDefault().long_name;
         }
     }
 

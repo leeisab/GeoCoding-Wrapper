@@ -26,18 +26,29 @@ namespace Geocode
                 Console.WriteLine("[Warning] API key Missing. Your requests may be throttled or limited");  
         }
 
+        //Calls an asynchronous method to make an HTTP GET request
         private GeoObj WebRequest(string arg) => GetRequest(arg).GetAwaiter().GetResult();
 
         private async Task<GeoObj> GetRequest(string arg)
         {
+            /*Google wants a '+' beween arguments in it's API
+             * The line below uses a regular expression to replace any spaces with a '+' */
             arg = Regex.Replace(arg, "\\s", "+");
+
             var client = new HttpClient();
             client.DefaultRequestHeaders.Accept.Clear();
             client.DefaultRequestHeaders.Accept.Add( new MediaTypeWithQualityHeaderValue("application/json"));
             var response = await client.GetAsync($"{BASE_URL}{arg}");
+            response.EnsureSuccessStatusCode(); //throws an expection if there was an error
+        
             var geo = new GeoObj();
+            //Deserializes the JSON 
             JsonConvert.PopulateObject(await response.Content.ReadAsStringAsync(), geo);
-            return geo;
+
+            if(geo.status == "OK")
+                return geo;
+            else //API returned an error message 
+                throw new Exception("Server returned status: " + geo.status);
         }
 
         /// <summary>
