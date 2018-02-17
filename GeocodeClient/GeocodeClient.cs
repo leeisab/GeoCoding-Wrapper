@@ -43,7 +43,7 @@ namespace Geocode
         /// <summary>
         /// Converts an address object into a set of coordinates
         /// </summary>
-        public MapLocation GetCoordinates(Address address)
+        public MapLocation GetMapLocation(Address address)
         {
             return new MapLocation(
                 WebRequest($"address={address.Street}+{address.Apt}+{address.Region}+{address.PostalCode}+{address.Country}"));
@@ -53,7 +53,7 @@ namespace Geocode
         /// <summary>
         /// Converts a string address to a set of Coordinates
         /// </summary>
-        public MapLocation GetCoordinates(string address)
+        public MapLocation GetMapLocation(string address)
         {
             return new MapLocation(
                 WebRequest($"address={address}"));
@@ -62,18 +62,9 @@ namespace Geocode
         /// <summary>
         /// Converts Coordinates into an address object
         /// </summary>
-        public Address GetAddress(MapLocation coordinates)
+        public MapLocation GetMapLocation(float lat,float lng)
         {
-            return new Address(
-                WebRequest($"latlng={coordinates.latitude},{coordinates.longitude}"));
-        }
-
-        /// <summary>
-        /// Converts Coordinates into an address object
-        /// </summary>
-        public Address GetAddress(float lat,float lng)
-        {
-            return new Address(
+            return new MapLocation(
                 WebRequest($"latlng={lat},{lng}"));
         }
     }
