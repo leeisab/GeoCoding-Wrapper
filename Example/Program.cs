@@ -21,7 +21,7 @@ namespace Google_Maps_Example
             string address = Console.ReadLine();
 
             //Object that holds our Coordinates
-            MapLocation coord = client.GetCoordinates(address);
+            MapLocation coord = client.GetMapLocation(address);
 
             Console.WriteLine("Latitude: " + coord.latitude);
             Console.WriteLine("Longitude: " + coord.longitude);
