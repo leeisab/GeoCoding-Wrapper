@@ -5,47 +5,76 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.IO;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 
 namespace Geocode
 {
+    /// <summary>
+    /// Contains methods for interacting with the Google Maps GeoCordinates API
+    /// </summary>
     public class GeocodeClient
     {
-        private string _apiKey = "";
+        private string _apiKey;
         private readonly string BASE_URL = "https://maps.googleapis.com/maps/api/geocode/json?";
 
         public GeocodeClient(string apiKey = null)
         {
-            if (apiKey != null) {
+            if (apiKey != null)
                 _apiKey = apiKey;
-            }
-            else {
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine("[Warning] API key Missing. Your requests may be throttled or limited");
-                Console.ForegroundColor = ConsoleColor.White;
-            }
+            else 
+                Console.WriteLine("[Warning] API key Missing. Your requests may be throttled or limited");  
         }
 
+        private GeoObj WebRequest(string arg) => GetRequest(arg).GetAwaiter().GetResult();
 
-        private string WebRequest(string arg) => GetRequest(arg).GetAwaiter().GetResult();
-
-        private async Task<string> GetRequest(string arg)
+        private async Task<GeoObj> GetRequest(string arg)
         {
-            HttpClient client = new HttpClient();
+            arg = Regex.Replace(arg, "\\s", "+");
+            var client = new HttpClient();
             client.DefaultRequestHeaders.Accept.Clear();
             client.DefaultRequestHeaders.Accept.Add( new MediaTypeWithQualityHeaderValue("application/json"));
             var response = await client.GetAsync($"{BASE_URL}{arg}");
-            return await response.Content.ReadAsStringAsync();
+            var geo = new GeoObj();
+            JsonConvert.PopulateObject(await response.Content.ReadAsStringAsync(), geo);
+            return geo;
         }
 
-        public GeoCoordinates GetCoordinates(GeoAddress address)
+        /// <summary>
+        /// Converts an address object into a set of coordinates
+        /// </summary>
+        public MapLocation GetCoordinates(Address address)
         {
-            string json = WebRequest($"address={address.firstline}+{address.secondline}+{address.region}+{address.postalCode}+{address.country}");
-            GeoObj objs = new GeoObj();
-            JsonConvert.PopulateObject(json, objs);
-            return new GeoCoordinates(objs);
+            return new MapLocation(
+                WebRequest($"address={address.Street}+{address.Apt}+{address.Region}+{address.PostalCode}+{address.Country}"));
+
+        }
+
+        /// <summary>
+        /// Converts a string address to a set of Coordinates
+        /// </summary>
+        public MapLocation GetCoordinates(string address)
+        {
+            return new MapLocation(
+                WebRequest($"address={address}"));
+        }
+
+        /// <summary>
+        /// Converts Coordinates into an address object
+        /// </summary>
+        public Address GetAddress(MapLocation coordinates)
+        {
+            return new Address(
+                WebRequest($"latlng={coordinates.latitude},{coordinates.longitude}"));
+        }
+
+        /// <summary>
+        /// Converts Coordinates into an address object
+        /// </summary>
+        public Address GetAddress(float lat,float lng)
+        {
+            return new Address(
+                WebRequest($"latlng={lat},{lng}"));
         }
     }
 }
