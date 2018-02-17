@@ -9,12 +9,6 @@ namespace Geocode
         public float latitude { get; }
         public float longitude { get; }
 
-        public MapLocation(float lat, float lng)
-        {
-            latitude = lat;
-            longitude = lng;
-        }
-
         internal MapLocation(GeoObj objs) : base(objs)
         {
             latitude = objs.results[0].geometry.location.lat;
