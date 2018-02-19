@@ -10,7 +10,7 @@ namespace Google_Maps_Example
     class Program
     {
         // set this string to your key from https://developers.google.com/maps/documentation/geocoding/start
-        static string apikey = "";
+        static string apikey = null;
 
         static void Main(string[] args)
         {
@@ -21,11 +21,12 @@ namespace Google_Maps_Example
             string address = Console.ReadLine();
 
             //Object that holds our Coordinates
-            MapLocation coord = client.GetMapLocation(address);
+            MapLocation location = client.GetMapLocation(address);
 
-            Console.WriteLine("Latitude: " + coord.latitude);
-            Console.WriteLine("Longitude: " + coord.longitude);
+            Console.WriteLine("Latitude: " + location.latitude);
+            Console.WriteLine("Longitude: " + location.longitude);
             Console.ReadKey();
+
         }
     }
 }
