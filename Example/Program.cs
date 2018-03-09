@@ -17,7 +17,7 @@ namespace Google_Maps_Example
             //The GeocodeClient can convert from an address to GeoCoordinates
             GeocodeClient client = new GeocodeClient(apikey);
 
-            Console.WriteLine("Enter an Address");
+            Console.WriteLine("Enter an Address: ");
             string address = Console.ReadLine();
 
             //Object that holds our Coordinates
